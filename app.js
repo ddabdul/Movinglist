@@ -45,7 +45,7 @@ const state = {
     categories: new Set()
   },
   open: {
-    shops: new Set(MAGASINS_ORDER),
+    shops: new Set(),
     categories: new Set()
   }
 };
