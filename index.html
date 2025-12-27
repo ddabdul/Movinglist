@@ -14,9 +14,14 @@
   <body>
     <main class="app">
       <header class="app-header">
-        <div class="title-wrap">
-          <p class="eyebrow">Checklist</p>
-          <h1>Liste d’achats – emménagement Limassol</h1>
+        <div class="header-top">
+          <div class="title-wrap">
+            <p class="eyebrow">Checklist</p>
+            <h1>Liste d’achats – emménagement Limassol</h1>
+          </div>
+          <button type="button" class="menu-button" id="menu-toggle" aria-expanded="false" aria-controls="toolbar">
+            Menu
+          </button>
         </div>
         <div class="overview">
           <div class="progress-card">
@@ -67,9 +72,9 @@
       <section class="list-section" id="list-container"></section>
     </main>
 
-    <div class="toolbar-spacer"></div>
+    <div class="toolbar-spacer hidden" id="toolbar-spacer"></div>
 
-    <nav class="toolbar" aria-label="Actions rapides">
+    <nav class="toolbar is-hidden" id="toolbar" aria-label="Actions rapides">
       <div class="toolbar-toggle">
         <label class="switch">
           <input type="checkbox" id="missing-only-toggle">

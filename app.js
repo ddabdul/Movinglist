@@ -65,7 +65,10 @@ const elements = {
   resetBtn: document.getElementById("reset-btn"),
   resetModal: document.getElementById("reset-modal"),
   cancelReset: document.getElementById("cancel-reset"),
-  confirmReset: document.getElementById("confirm-reset")
+  confirmReset: document.getElementById("confirm-reset"),
+  menuToggle: document.getElementById("menu-toggle"),
+  toolbar: document.getElementById("toolbar"),
+  toolbarSpacer: document.getElementById("toolbar-spacer")
 };
 
 const safeShopOrder = MAGASINS_ORDER.filter((shop) => DATA.some((item) => item.magasin === shop));
@@ -379,6 +382,12 @@ function closeResetModal() {
   elements.resetModal.classList.add("hidden");
 }
 
+function setToolbarOpen(isOpen) {
+  elements.toolbar.classList.toggle("is-hidden", !isOpen);
+  elements.toolbarSpacer.classList.toggle("hidden", !isOpen);
+  elements.menuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+}
+
 function exportJson() {
   const payload = {
     version: 1,
@@ -545,6 +554,11 @@ function bindEvents() {
       closeResetModal();
     }
   });
+
+  elements.menuToggle.addEventListener("click", () => {
+    const isOpen = !elements.toolbar.classList.contains("is-hidden");
+    setToolbarOpen(!isOpen);
+  });
 }
 
 function init() {
@@ -555,6 +569,7 @@ function init() {
   loadCheckedState();
   elements.searchInput.value = state.search;
   elements.missingToggle.checked = state.missingOnly;
+  setToolbarOpen(false);
   renderFilters();
   bindEvents();
   renderList();

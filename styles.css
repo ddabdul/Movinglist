@@ -83,6 +83,13 @@ header {
   animation: float-in 0.5s ease both;
 }
 
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   font-size: 0.75rem;
@@ -170,6 +177,17 @@ h3 {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ink-2);
+}
+
+.menu-button {
+  min-height: 42px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card-strong);
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .controls {
@@ -398,6 +416,11 @@ details[open] summary::after {
 
 .toolbar-spacer {
   height: 120px;
+  transition: height 0.2s ease;
+}
+
+.toolbar-spacer.hidden {
+  height: 0;
 }
 
 .toolbar {
@@ -412,6 +435,13 @@ details[open] summary::after {
   border-top: 1px solid var(--border);
   backdrop-filter: blur(8px);
   z-index: 10;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.toolbar.is-hidden {
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .toolbar-toggle {
