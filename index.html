@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#f3e7d3" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#111418" media="(prefers-color-scheme: dark)">
+    <title>Liste d’achats – emménagement Limassol</title>
+    <link rel="icon" type="image/png" sizes="256x256" href="icon/icon.256x256.png">
+    <link rel="apple-touch-icon" href="icon/icon.256x256.png">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="app-header">
+        <div class="title-wrap">
+          <p class="eyebrow">Checklist</p>
+          <h1>Liste d’achats – emménagement Limassol</h1>
+        </div>
+        <div class="overview">
+          <div class="progress-card">
+            <div class="progress-header">
+              <span>Progression globale</span>
+              <span id="overall-progress-text">0%</span>
+            </div>
+            <div
+              class="progress-bar"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+            >
+              <div class="progress-fill" id="overall-progress"></div>
+            </div>
+          </div>
+          <div class="missing-card">
+            <div class="missing-count" id="missing-count">0</div>
+            <div class="missing-label">Manquants</div>
+          </div>
+        </div>
+      </header>
+
+      <section class="controls">
+        <label class="search">
+          <span class="sr-only">Rechercher un article</span>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Rechercher un article..."
+            autocomplete="off"
+          >
+        </label>
+
+        <div class="filters">
+          <div class="filter-group">
+            <div class="filter-title">Magasins</div>
+            <div class="chip-row" id="magasin-filters"></div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-title">Catégories</div>
+            <div class="chip-row" id="categorie-filters"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="list-section" id="list-container"></section>
+    </main>
+
+    <div class="toolbar-spacer"></div>
+
+    <nav class="toolbar" aria-label="Actions rapides">
+      <div class="toolbar-toggle">
+        <label class="switch">
+          <input type="checkbox" id="missing-only-toggle">
+          <span class="slider" aria-hidden="true"></span>
+        </label>
+        <span>Manquants seulement</span>
+      </div>
+      <div class="toolbar-actions">
+        <button type="button" class="ghost" id="export-btn">Exporter JSON</button>
+        <button type="button" class="ghost" id="import-btn">Importer JSON</button>
+        <button type="button" class="danger" id="reset-btn">Réinitialiser</button>
+      </div>
+    </nav>
+
+    <input type="file" id="import-file" accept="application/json" hidden>
+
+    <div class="modal hidden" id="reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-title">
+      <div class="modal-card" role="document">
+        <h2 id="reset-title">Réinitialiser la liste ?</h2>
+        <p>Cette action décochera tous les éléments.</p>
+        <div class="modal-actions">
+          <button type="button" class="ghost" id="cancel-reset">Annuler</button>
+          <button type="button" class="danger" id="confirm-reset">Oui, réinitialiser</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="data.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>
