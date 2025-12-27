@@ -216,18 +216,38 @@ h3 {
   gap: 14px;
 }
 
-.filter-title {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--ink-2);
-  margin-bottom: 6px;
-}
-
 .chip-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.filter-panel {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.filter-panel summary {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-2);
+}
+
+.filter-panel summary::after {
+  right: 16px;
+  top: 18px;
+}
+
+.filter-panel .chip-row {
+  padding: 0 14px 14px;
 }
 
 .chip {
