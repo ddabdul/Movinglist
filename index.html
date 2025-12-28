@@ -83,6 +83,7 @@
         <span>Manquants seulement</span>
       </div>
       <div class="toolbar-actions">
+        <button type="button" class="ghost" id="add-item-btn">Ajouter un élément</button>
         <button type="button" class="ghost" id="export-btn">Exporter JSON</button>
         <button type="button" class="ghost" id="import-btn">Importer JSON</button>
         <button type="button" class="danger" id="reset-btn">Réinitialiser</button>
@@ -99,6 +100,36 @@
           <button type="button" class="ghost" id="cancel-reset">Annuler</button>
           <button type="button" class="danger" id="confirm-reset">Oui, réinitialiser</button>
         </div>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="add-modal" role="dialog" aria-modal="true" aria-labelledby="add-title">
+      <div class="modal-card" role="document">
+        <h2 id="add-title">Ajouter un élément</h2>
+        <form id="add-form">
+          <div class="form-grid">
+            <label class="field">
+              <span>Magasin</span>
+              <select id="add-magasin" required></select>
+            </label>
+            <label class="field">
+              <span>Catégorie</span>
+              <select id="add-categorie" required></select>
+            </label>
+            <label class="field">
+              <span>Libellé</span>
+              <input id="add-libelle" type="text" placeholder="Ex : Rallonge multiprise" required>
+            </label>
+            <label class="field">
+              <span>Notes (optionnel)</span>
+              <textarea id="add-notes" rows="3" placeholder="Détails, tailles, marque..."></textarea>
+            </label>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="ghost" id="cancel-add">Annuler</button>
+            <button type="submit">Ajouter</button>
+          </div>
+        </form>
       </div>
     </div>
 

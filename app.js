@@ -1,6 +1,7 @@
 const DATA = Array.isArray(window.CHECKLIST_DATA) ? window.CHECKLIST_DATA : [];
 
 const STORAGE_KEY = "movinglist-checklist-v1";
+const CUSTOM_STORAGE_KEY = "movinglist-custom-items-v1";
 
 const MAGASINS_ORDER = ["JUMBO", "STEPHANIS", "ALPHAMEGA", "SUPERHOME CENTER"];
 
@@ -38,6 +39,7 @@ const CATEGORY_FILTERS = [
 
 const state = {
   checkedById: {},
+  customItems: [],
   search: "",
   missingOnly: false,
   filters: {
@@ -68,7 +70,15 @@ const elements = {
   confirmReset: document.getElementById("confirm-reset"),
   menuToggle: document.getElementById("menu-toggle"),
   toolbar: document.getElementById("toolbar"),
-  toolbarSpacer: document.getElementById("toolbar-spacer")
+  toolbarSpacer: document.getElementById("toolbar-spacer"),
+  addItemBtn: document.getElementById("add-item-btn"),
+  addModal: document.getElementById("add-modal"),
+  addForm: document.getElementById("add-form"),
+  addMagasin: document.getElementById("add-magasin"),
+  addCategorie: document.getElementById("add-categorie"),
+  addLibelle: document.getElementById("add-libelle"),
+  addNotes: document.getElementById("add-notes"),
+  cancelAdd: document.getElementById("cancel-add")
 };
 
 const safeShopOrder = MAGASINS_ORDER.filter((shop) => DATA.some((item) => item.magasin === shop));
@@ -112,6 +122,51 @@ function loadCheckedState() {
   });
 }
 
+function sanitizeCustomItem(item) {
+  if (!item || typeof item !== "object") {
+    return null;
+  }
+  if (!item.id || !item.magasin || !item.categorie || !item.libelle) {
+    return null;
+  }
+  return {
+    id: String(item.id),
+    magasin: String(item.magasin),
+    categorie: String(item.categorie),
+    libelle: String(item.libelle),
+    notes: item.notes ? String(item.notes) : ""
+  };
+}
+
+function loadCustomItems() {
+  let items = [];
+  try {
+    const raw = localStorage.getItem(CUSTOM_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        items = parsed.map(sanitizeCustomItem).filter(Boolean);
+      }
+    }
+  } catch (error) {
+    items = [];
+  }
+  state.customItems = items;
+  items.forEach((item) => {
+    if (state.checkedById[item.id] === undefined) {
+      state.checkedById[item.id] = false;
+    }
+  });
+}
+
+function saveCustomItems() {
+  try {
+    localStorage.setItem(CUSTOM_STORAGE_KEY, JSON.stringify(state.customItems));
+  } catch (error) {
+    // Ignore storage errors.
+  }
+}
+
 function saveCheckedState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ checked: state.checkedById }));
@@ -120,12 +175,16 @@ function saveCheckedState() {
   }
 }
 
+function getAllItems() {
+  return DATA.concat(state.customItems);
+}
+
 function computeStats() {
   const overall = { total: 0, checked: 0 };
   const byShop = {};
   const byShopCategory = {};
 
-  DATA.forEach((item) => {
+  getAllItems().forEach((item) => {
     const checked = Boolean(state.checkedById[item.id]);
     overall.total += 1;
     if (checked) {
@@ -257,7 +316,7 @@ function renderList() {
   const stats = computeStats();
   updateHeader(stats);
 
-  const filteredItems = DATA.filter((item) => matchesFilters(item));
+  const filteredItems = getAllItems().filter((item) => matchesFilters(item));
   if (!filteredItems.length) {
     elements.listContainer.innerHTML =
       '<div class="empty-state">Aucun élément ne correspond à vos filtres.</div>';
@@ -363,7 +422,7 @@ function renderList() {
 }
 
 function applyBulkAction(scope, value, shouldCheck) {
-  const items = DATA.filter((item) =>
+  const items = getAllItems().filter((item) =>
     scope === "magasin" ? item.magasin === value : item.categorie === value
   );
   items.forEach((item) => {
@@ -382,6 +441,16 @@ function closeResetModal() {
   elements.resetModal.classList.add("hidden");
 }
 
+function openAddModal() {
+  elements.addModal.classList.remove("hidden");
+  elements.addLibelle.focus();
+}
+
+function closeAddModal() {
+  elements.addModal.classList.add("hidden");
+  elements.addForm.reset();
+}
+
 function setToolbarOpen(isOpen) {
   elements.toolbar.classList.toggle("is-hidden", !isOpen);
   elements.toolbarSpacer.classList.toggle("hidden", !isOpen);
@@ -392,6 +461,7 @@ function exportJson() {
   const payload = {
     version: 1,
     exportedAt: new Date().toISOString(),
+    customItems: state.customItems,
     checked: state.checkedById
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -408,6 +478,10 @@ function exportJson() {
 function parseImportedData(payload) {
   if (!payload || typeof payload !== "object") {
     return null;
+  }
+  if (Array.isArray(payload.customItems)) {
+    state.customItems = payload.customItems.map(sanitizeCustomItem).filter(Boolean);
+    saveCustomItems();
   }
   if (payload.checked && typeof payload.checked === "object") {
     return payload.checked;
@@ -435,7 +509,7 @@ function importJsonFile(file) {
         window.alert("Le fichier importé ne contient pas de données valides.");
         return;
       }
-      DATA.forEach((item) => {
+      getAllItems().forEach((item) => {
         state.checkedById[item.id] = Boolean(importedChecked[item.id]);
       });
       saveCheckedState();
@@ -555,6 +629,39 @@ function bindEvents() {
     }
   });
 
+  elements.addItemBtn.addEventListener("click", openAddModal);
+  elements.cancelAdd.addEventListener("click", closeAddModal);
+  elements.addModal.addEventListener("click", (event) => {
+    if (event.target === elements.addModal) {
+      closeAddModal();
+    }
+  });
+
+  elements.addForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const magasin = elements.addMagasin.value;
+    const categorie = elements.addCategorie.value;
+    const libelle = elements.addLibelle.value.trim();
+    const notes = elements.addNotes.value.trim();
+    if (!magasin || !categorie || !libelle) {
+      return;
+    }
+
+    const newItem = {
+      id: `custom-${Date.now()}-${Math.random().toString(16).slice(2, 6)}`,
+      magasin,
+      categorie,
+      libelle,
+      notes
+    };
+    state.customItems.push(newItem);
+    state.checkedById[newItem.id] = false;
+    saveCustomItems();
+    saveCheckedState();
+    renderList();
+    closeAddModal();
+  });
+
   elements.menuToggle.addEventListener("click", () => {
     const isOpen = !elements.toolbar.classList.contains("is-hidden");
     setToolbarOpen(!isOpen);
@@ -567,9 +674,22 @@ function init() {
     return;
   }
   loadCheckedState();
+  loadCustomItems();
   elements.searchInput.value = state.search;
   elements.missingToggle.checked = state.missingOnly;
   setToolbarOpen(false);
+  MAGASINS_ORDER.forEach((magasin) => {
+    const option = document.createElement("option");
+    option.value = magasin;
+    option.textContent = magasin;
+    elements.addMagasin.appendChild(option);
+  });
+  CATEGORY_ORDER.forEach((categorie) => {
+    const option = document.createElement("option");
+    option.value = categorie;
+    option.textContent = categorie;
+    elements.addCategorie.appendChild(option);
+  });
   renderFilters();
   bindEvents();
   renderList();

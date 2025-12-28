@@ -582,6 +582,35 @@ summary:focus-visible {
   color: var(--ink-2);
 }
 
+.form-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card-strong);
+  color: var(--ink-1);
+  font-size: 0.95rem;
+}
+
+.field textarea {
+  resize: vertical;
+}
+
 .modal-actions {
   display: flex;
   gap: 10px;
